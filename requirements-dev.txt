@@ -1,0 +1,5 @@
+-r requirements.txt
+pytest>=8.0
+hypothesis>=6.98
+mypy>=1.11
+ruff>=0.5
