@@ -57,8 +57,23 @@ class DataQualityIssue(str, Enum):
     DATE_JITTER = "DATE_JITTER"
 
 
+_DEFAULT_ISSUE_DISTRIBUTION = {
+    DataQualityIssue.MISSING_VALUES: 1.0,
+    DataQualityIssue.TYPOS_NOISE: 1.0,
+    DataQualityIssue.OUTLIER_AMOUNT: 1.0,
+    DataQualityIssue.DUPLICATE_ROWS: 1.0,
+    DataQualityIssue.SWAP_FIELDS: 1.0,
+    DataQualityIssue.DATE_JITTER: 1.0,
+}
+
+
 class DataQualityConfig(BaseModel):
-    """Configuration for data quality injection."""
+    """Configuration for data quality injection.
+
+    When ``enabled`` is ``True`` and no explicit ``issue_dist`` is supplied the
+    configuration defaults to a uniform distribution across all supported issue
+    types.
+    """
 
     model_config = ConfigDict(frozen=True)
 
@@ -71,10 +86,14 @@ class DataQualityConfig(BaseModel):
 
     @model_validator(mode="after")
     def _validate_dist(self) -> DataQualityConfig:
+        source: Mapping[DataQualityIssue, float] | None = None
         if self.enabled:
-            if not self.issue_dist:
-                raise ConfigurationError("issue_dist must be provided when dirty data is enabled")
-            normalized = _normalize_dist({k.value: v for k, v in self.issue_dist.items()})
+            source = self.issue_dist or _DEFAULT_ISSUE_DISTRIBUTION
+        elif self.issue_dist:
+            source = self.issue_dist
+
+        if source is not None:
+            normalized = _normalize_dist({k.value: v for k, v in source.items()})
             object.__setattr__(
                 self,
                 "issue_dist",
@@ -115,7 +134,17 @@ class GeneratorConfig(BaseModel):
     merchant_category_dist: Mapping[str, float] | None = None
     fraud_rate: float = Field(ge=0.0, le=1.0, default=0.02)
     fraud_type_dist: Mapping[str, float] = Field(
-        default_factory=lambda: {FraudType.CARD_NOT_PRESENT.value: 1.0}
+        default_factory=lambda: {
+            FraudType.CARD_NOT_PRESENT.value: 0.22,
+            FraudType.ACCOUNT_TAKEOVER.value: 0.18,
+            FraudType.AUTHORIZED_PUSH_PAYMENT.value: 0.12,
+            FraudType.CARD_PRESENT_CLONED.value: 0.1,
+            FraudType.SKIMMING.value: 0.1,
+            FraudType.SYNTHETIC_IDENTITY.value: 0.1,
+            FraudType.MONEY_MULE.value: 0.08,
+            FraudType.FRIENDLY_FRAUD.value: 0.05,
+            FraudType.SOCIAL_ENGINEERING.value: 0.05,
+        }
     )
     causal_fraud: bool = Field(alias="casual_fraud", default=False)
     causal_fraud_rate: float = Field(ge=0.0, le=1.0, default=0.0)

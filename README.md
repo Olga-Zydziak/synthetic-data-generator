@@ -23,7 +23,7 @@ pip install -e .
 fraudforge generate \
   --records 1000 \
   --age-dist "A18_25:0.3,A26_35:0.3,A36_50:0.25,A50_PLUS:0.15" \
-  --fraud-type-dist "CARD_NOT_PRESENT:0.7,ACCOUNT_TAKEOVER:0.3" \
+  --fraud-type-dist "CARD_NOT_PRESENT:0.5,ACCOUNT_TAKEOVER:0.2,CARD_PRESENT_CLONED:0.3" \
   --fraud-rate 0.03 \
   --causal-fraud \
   --causal-fraud-rate 0.01 \
@@ -33,6 +33,23 @@ fraudforge generate \
 
 The command creates `transactions.csv.gz` and `metadata.json` under `./out` and prints metadata to
 stdout in JSON form.
+
+## Configuration reference
+
+- **Distributions** (`*_dist` fields) accept comma-separated `KEY:WEIGHT` pairs on the CLI and
+  dictionaries in Python. Keys must match the enum values below; weights are automatically
+  normalized to sum to 1.0.
+- **Fraud types**: `CARD_NOT_PRESENT`, `ACCOUNT_TAKEOVER`, `SKIMMING`,
+  `AUTHORIZED_PUSH_PAYMENT`, `CARD_PRESENT_CLONED`, `SYNTHETIC_IDENTITY`, `FRIENDLY_FRAUD`,
+  `MONEY_MULE`, `SOCIAL_ENGINEERING`.
+- **Causal scenarios** (toggle with `causal_fraud`): Simpson's paradox on region×channel and a
+  collider-bias review process; both mark `is_causal_fraud` and are summarized in metadata.
+- **Dirty data**: set `data_quality.enabled=True` (or `--dirty`). If no `issue_dist` is supplied the
+  generator defaults to an even mix of all supported dirty-data injectors. Provide
+  `ISSUE:PROB,...` to bias toward specific problems.
+- **Synth calibration**: optional plugins (`--synth`) can recalibrate specific columns without
+  touching labels; list columns with `--synth-calibrate-cols` and optionally preserve cohorts with
+  `--synth-condition-cols`.
 
 ## Using in JupyterLab
 
@@ -55,8 +72,10 @@ stdout in JSON form.
        records=5_000,
        fraud_rate=0.05,
        fraud_type_dist={
-           "CARD_NOT_PRESENT": 0.6,
-           "ACCOUNT_TAKEOVER": 0.4,
+           "CARD_NOT_PRESENT": 0.4,
+           "ACCOUNT_TAKEOVER": 0.2,
+           "SYNTHETIC_IDENTITY": 0.2,
+           "SOCIAL_ENGINEERING": 0.2,
        },
        age_dist={
            "A18_25": 0.3,
@@ -89,7 +108,8 @@ stdout in JSON form.
 
 The generator is deterministic for a fixed seed, so rerunning the notebook cell with the same
 configuration will produce identical outputs. Adjust the configuration inside the notebook to
-experiment with fraud rates, causal scenarios, dirty data options, or synthesizer integrations.
+experiment with richer fraud type mixes (regular and causal), causal scenarios, dirty data options,
+or synthesizer integrations.
 
 ## Development
 

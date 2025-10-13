@@ -21,3 +21,9 @@ def test_data_quality_normalization() -> None:
         issue_dist={DataQualityIssue.MISSING_VALUES: 2, DataQualityIssue.TYPOS_NOISE: 1},
     )
     assert abs(sum(dq.issue_dist.values()) - 1.0) < 1e-9
+
+
+def test_data_quality_default_distribution_when_enabled() -> None:
+    dq = DataQualityConfig(enabled=True, row_dirty_rate=0.1)
+    assert abs(sum(dq.issue_dist.values()) - 1.0) < 1e-9
+    assert set(dq.issue_dist.keys()) == set(DataQualityIssue)
