@@ -23,7 +23,11 @@ pip install -e .
 fraudforge generate \
   --records 1000 \
   --age-dist "A18_25:0.3,A26_35:0.3,A36_50:0.25,A50_PLUS:0.15" \
+
   --fraud-type-dist "CARD_NOT_PRESENT:0.5,ACCOUNT_TAKEOVER:0.2,CARD_PRESENT_CLONED:0.3" \
+
+  --fraud-type-dist "CARD_NOT_PRESENT:0.7,ACCOUNT_TAKEOVER:0.3" \
+
   --fraud-rate 0.03 \
   --causal-fraud \
   --causal-fraud-rate 0.01 \
@@ -33,6 +37,7 @@ fraudforge generate \
 
 The command creates `transactions.csv.gz` and `metadata.json` under `./out` and prints metadata to
 stdout in JSON form.
+
 
 ## Configuration reference
 
@@ -110,6 +115,8 @@ The generator is deterministic for a fixed seed, so rerunning the notebook cell 
 configuration will produce identical outputs. Adjust the configuration inside the notebook to
 experiment with richer fraud type mixes (regular and causal), causal scenarios, dirty data options,
 or synthesizer integrations.
+
+
 
 ## Development
 

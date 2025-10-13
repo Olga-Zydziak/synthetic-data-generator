@@ -57,6 +57,7 @@ class DataQualityIssue(str, Enum):
     DATE_JITTER = "DATE_JITTER"
 
 
+
 _DEFAULT_ISSUE_DISTRIBUTION = {
     DataQualityIssue.MISSING_VALUES: 1.0,
     DataQualityIssue.TYPOS_NOISE: 1.0,
@@ -75,6 +76,10 @@ class DataQualityConfig(BaseModel):
     types.
     """
 
+class DataQualityConfig(BaseModel):
+    """Configuration for data quality injection."""
+
+
     model_config = ConfigDict(frozen=True)
 
     enabled: bool = False
@@ -86,6 +91,7 @@ class DataQualityConfig(BaseModel):
 
     @model_validator(mode="after")
     def _validate_dist(self) -> DataQualityConfig:
+
         source: Mapping[DataQualityIssue, float] | None = None
         if self.enabled:
             source = self.issue_dist or _DEFAULT_ISSUE_DISTRIBUTION
@@ -94,6 +100,12 @@ class DataQualityConfig(BaseModel):
 
         if source is not None:
             normalized = _normalize_dist({k.value: v for k, v in source.items()})
+
+        if self.enabled:
+            if not self.issue_dist:
+                raise ConfigurationError("issue_dist must be provided when dirty data is enabled")
+            normalized = _normalize_dist({k.value: v for k, v in self.issue_dist.items()})
+
             object.__setattr__(
                 self,
                 "issue_dist",
@@ -134,6 +146,7 @@ class GeneratorConfig(BaseModel):
     merchant_category_dist: Mapping[str, float] | None = None
     fraud_rate: float = Field(ge=0.0, le=1.0, default=0.02)
     fraud_type_dist: Mapping[str, float] = Field(
+
         default_factory=lambda: {
             FraudType.CARD_NOT_PRESENT.value: 0.22,
             FraudType.ACCOUNT_TAKEOVER.value: 0.18,
@@ -145,6 +158,9 @@ class GeneratorConfig(BaseModel):
             FraudType.FRIENDLY_FRAUD.value: 0.05,
             FraudType.SOCIAL_ENGINEERING.value: 0.05,
         }
+
+        default_factory=lambda: {FraudType.CARD_NOT_PRESENT.value: 1.0}
+
     )
     causal_fraud: bool = Field(alias="casual_fraud", default=False)
     causal_fraud_rate: float = Field(ge=0.0, le=1.0, default=0.0)
