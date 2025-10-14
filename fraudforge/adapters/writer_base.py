@@ -47,7 +47,9 @@ class BaseWriter:
         bucket: BucketExporter | None = None,
     ) -> None:
 
+
     def __init__(self, outdir: Path, filename: str) -> None:
+
 
         try:
             outdir.mkdir(parents=True, exist_ok=True)
@@ -58,6 +60,11 @@ class BaseWriter:
         self._metadata_path = (self._outdir / "metadata.json").resolve()
 
         self._bucket = bucket
+
+
+
+        self._bucket = bucket
+
 
 
     @property
@@ -73,4 +80,9 @@ class BaseWriter:
 
         if self._bucket is not None:
             self._bucket.export(self._path, self._metadata_path)
+
+
+        if self._bucket is not None:
+            self._bucket.export(self._path, self._metadata_path)
+
 

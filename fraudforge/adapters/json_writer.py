@@ -11,6 +11,10 @@ import pandas as pd
 
 from ..storage import BucketExporter
 
+
+from ..storage import BucketExporter
+
+
 from .writer_base import BaseWriter, _json_default
 
 
@@ -21,8 +25,13 @@ class JSONWriter(BaseWriter):
     def __init__(self, outdir: Path, bucket: BucketExporter | None = None) -> None:
         super().__init__(outdir, "transactions.jsonl.gz", bucket=bucket)
 
+
+    def __init__(self, outdir: Path, bucket: BucketExporter | None = None) -> None:
+        super().__init__(outdir, "transactions.jsonl.gz", bucket=bucket)
+
     def __init__(self, outdir: Path) -> None:
         super().__init__(outdir, "transactions.jsonl.gz")
+
 
         self._handle = gzip.open(self.path, "wb")
 

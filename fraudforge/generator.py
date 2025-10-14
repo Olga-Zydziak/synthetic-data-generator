@@ -223,6 +223,8 @@ class TransactionGenerator:
 
         outdir = cfg.output.outdir
 
+
+
         bucket = cfg.output.bucket.exporter() if cfg.output.bucket is not None else None
         if cfg.output.format == "csv":
             return CSVWriter(outdir, bucket=bucket)

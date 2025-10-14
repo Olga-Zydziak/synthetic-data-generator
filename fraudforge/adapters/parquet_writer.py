@@ -11,6 +11,10 @@ import pyarrow.parquet as pq
 
 from ..storage import BucketExporter
 
+
+from ..storage import BucketExporter
+
+
 from .writer_base import BaseWriter
 
 
@@ -21,8 +25,13 @@ class ParquetWriter(BaseWriter):
     def __init__(self, outdir: Path, bucket: BucketExporter | None = None) -> None:
         super().__init__(outdir, "transactions.parquet", bucket=bucket)
 
+
+    def __init__(self, outdir: Path, bucket: BucketExporter | None = None) -> None:
+        super().__init__(outdir, "transactions.parquet", bucket=bucket)
+
     def __init__(self, outdir: Path) -> None:
         super().__init__(outdir, "transactions.parquet")
+
 
         self._writer: pq.ParquetWriter | None = None
 

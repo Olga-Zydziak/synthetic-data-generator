@@ -8,6 +8,11 @@ from pathlib import Path
 from typing import Any, cast
 
 
+
+from typing import Any, cast
+
+
+
 import orjson
 import pandas as pd
 import typer
@@ -87,6 +92,8 @@ def generate(
         None, help="Condition columns for synth."
     ),
 
+
+
     bucket_name: str | None = typer.Option(
         None, help="Optional bucket name for exporting artifacts."
     ),
@@ -113,10 +120,12 @@ def generate(
             raise typer.BadParameter("Configuration file must contain a mapping")
         data = cast(dict[str, Any], loaded)
 
+
     data: dict[str, object] = {}
     if config_path:
         with config_path.open("r", encoding="utf-8") as handle:
             data = json.load(handle)
+
 
 
     age_mapping = _parse_mapping(age_dist)
