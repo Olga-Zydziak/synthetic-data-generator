@@ -222,6 +222,7 @@ class TransactionGenerator:
         """
 
         outdir = cfg.output.outdir
+
         bucket = cfg.output.bucket.exporter() if cfg.output.bucket is not None else None
         if cfg.output.format == "csv":
             return CSVWriter(outdir, bucket=bucket)
@@ -229,6 +230,14 @@ class TransactionGenerator:
             return JSONWriter(outdir, bucket=bucket)
         if cfg.output.format == "parquet":
             return ParquetWriter(outdir, bucket=bucket)
+
+        if cfg.output.format == "csv":
+            return CSVWriter(outdir)
+        if cfg.output.format == "json":
+            return JSONWriter(outdir)
+        if cfg.output.format == "parquet":
+            return ParquetWriter(outdir)
+
         raise GenerationError(f"Unsupported output format {cfg.output.format}")
 
     def _maybe_calibrate(self, cfg: GeneratorConfig) -> GeneratorConfig:

@@ -3,7 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import pandas as pd
+
 from pytest import MonkeyPatch
+
+
 
 from fraudforge.config import GeneratorConfig
 from fraudforge.generator import TransactionGenerator
@@ -50,6 +53,7 @@ def test_generation_pipeline(tmp_path: Path) -> None:
     assert metadata["synth"]["backend"] == "none"
 
 
+
 def test_generation_bucket_export(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
     bucket_root = tmp_path / "bucket-root"
     monkeypatch.setenv("FRAUDFORGE_BUCKET_ROOT", str(bucket_root))
@@ -82,3 +86,4 @@ def test_generation_bucket_export(tmp_path: Path, monkeypatch: MonkeyPatch) -> N
     bucket_path = bucket_root / "demo" / "exports"
     assert (bucket_path / "transactions.csv.gz").exists()
     assert (bucket_path / "metadata.json").exists()
+

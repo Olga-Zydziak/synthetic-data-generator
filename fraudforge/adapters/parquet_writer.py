@@ -8,15 +8,22 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+
 from ..storage import BucketExporter
+
 from .writer_base import BaseWriter
 
 
 class ParquetWriter(BaseWriter):
     """Streams transactions to a Parquet file using pyarrow."""
 
+
     def __init__(self, outdir: Path, bucket: BucketExporter | None = None) -> None:
         super().__init__(outdir, "transactions.parquet", bucket=bucket)
+
+    def __init__(self, outdir: Path) -> None:
+        super().__init__(outdir, "transactions.parquet")
+
         self._writer: pq.ParquetWriter | None = None
 
     def write(self, df: pd.DataFrame) -> None:

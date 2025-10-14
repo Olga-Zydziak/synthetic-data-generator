@@ -8,15 +8,23 @@ from pathlib import Path
 
 import pandas as pd
 
+
 from ..storage import BucketExporter
+
+
 from .writer_base import BaseWriter
 
 
 class CSVWriter(BaseWriter):
     """Streams transactions into a gzipped CSV file."""
 
+
     def __init__(self, outdir: Path, bucket: BucketExporter | None = None) -> None:
         super().__init__(outdir, "transactions.csv.gz", bucket=bucket)
+
+    def __init__(self, outdir: Path) -> None:
+        super().__init__(outdir, "transactions.csv.gz")
+
         self._handle = gzip.open(self.path, "wt", encoding="utf-8")
         self._wrote_header = False
 

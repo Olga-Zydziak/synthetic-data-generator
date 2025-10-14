@@ -3,7 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import pandas as pd
+
 from pytest import MonkeyPatch
+
 from typer.testing import CliRunner
 
 from fraudforge.cli import app
@@ -71,6 +73,7 @@ def test_cli_dirty_toggle(tmp_path: Path) -> None:
     assert csv_path.exists()
 
 
+
 def test_cli_bucket(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
     runner = CliRunner()
     bucket_root = tmp_path / "bucket"
@@ -99,3 +102,4 @@ def test_cli_bucket(tmp_path: Path, monkeypatch: MonkeyPatch) -> None:
     )
     assert result.exit_code == 0
     assert (bucket_root / "cli" / "exports" / "transactions.csv.gz").exists()
+
