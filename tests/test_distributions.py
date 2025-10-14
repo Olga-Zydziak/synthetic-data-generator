@@ -29,3 +29,4 @@ def test_data_quality_default_distribution_when_enabled() -> None:
     assert abs(sum(dq.issue_dist.values()) - 1.0) < 1e-9
     assert set(dq.issue_dist.keys()) == set(DataQualityIssue)
 
+

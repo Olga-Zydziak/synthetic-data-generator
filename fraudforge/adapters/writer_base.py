@@ -10,6 +10,8 @@ import pandas as pd
 
 from ..exceptions import WriterError
 
+from ..storage import BucketExporter
+
 
 def _json_default(value: object) -> str | list[object]:
     """Convert unsupported JSON types to serializable values.
@@ -37,7 +39,16 @@ def _json_default(value: object) -> str | list[object]:
 class BaseWriter:
     """Common functionality for streaming writers."""
 
+
+    def __init__(
+        self,
+        outdir: Path,
+        filename: str,
+        bucket: BucketExporter | None = None,
+    ) -> None:
+
     def __init__(self, outdir: Path, filename: str) -> None:
+
         try:
             outdir.mkdir(parents=True, exist_ok=True)
         except OSError as exc:  # pragma: no cover - filesystem errors
@@ -45,6 +56,9 @@ class BaseWriter:
         self._outdir = outdir.resolve()
         self._path = (self._outdir / filename).resolve()
         self._metadata_path = (self._outdir / "metadata.json").resolve()
+
+        self._bucket = bucket
+
 
     @property
     def path(self) -> Path:
@@ -56,3 +70,7 @@ class BaseWriter:
                 json.dump(metadata, handle, indent=2, default=_json_default)
         except OSError as exc:  # pragma: no cover - filesystem errors
             raise WriterError(f"Failed to write metadata: {exc}") from exc
+
+        if self._bucket is not None:
+            self._bucket.export(self._path, self._metadata_path)
+

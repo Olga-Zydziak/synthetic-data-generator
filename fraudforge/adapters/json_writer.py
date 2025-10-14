@@ -8,14 +8,22 @@ from pathlib import Path
 import orjson
 import pandas as pd
 
+
+from ..storage import BucketExporter
+
 from .writer_base import BaseWriter, _json_default
 
 
 class JSONWriter(BaseWriter):
     """Streams transactions into gzipped JSON Lines."""
 
+
+    def __init__(self, outdir: Path, bucket: BucketExporter | None = None) -> None:
+        super().__init__(outdir, "transactions.jsonl.gz", bucket=bucket)
+
     def __init__(self, outdir: Path) -> None:
         super().__init__(outdir, "transactions.jsonl.gz")
+
         self._handle = gzip.open(self.path, "wb")
 
     def write(self, df: pd.DataFrame) -> None:

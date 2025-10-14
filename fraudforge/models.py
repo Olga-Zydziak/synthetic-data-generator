@@ -42,7 +42,6 @@ class FraudType(StrEnum):
 
 
 
-
 class Channel(StrEnum):
     """Enumeration of customer interaction channels."""
 
