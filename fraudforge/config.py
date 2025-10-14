@@ -1,5 +1,3 @@
-"""Configuration models for the fraudforge generator."""
-
 from __future__ import annotations
 
 
@@ -30,13 +28,12 @@ from .models import AgeBand, Channel, FraudType, Region
 
 from .storage import BucketExporter
 
+
+
+
 __all__ = [
+
     "BucketOptions",
-
-
-__all__ = [
-
-
     "OutputOptions",
     "DataQualityIssue",
     "DataQualityConfig",
@@ -220,10 +217,7 @@ class GeneratorConfig(BaseModel):
     fraud_rate: float = Field(ge=0.0, le=1.0, default=0.02)
     fraud_type_dist: Mapping[str, float] = Field(
 
-        default_factory=lambda: {
-
-
-        default_factory=lambda: {
+        
 
 
         default_factory=lambda:{
@@ -238,16 +232,9 @@ class GeneratorConfig(BaseModel):
             FraudType.MONEY_MULE.value: 0.08,
             FraudType.FRIENDLY_FRAUD.value: 0.05,
             FraudType.SOCIAL_ENGINEERING.value: 0.05,
-
-        }
-
-
-        }
-
             FraudType.CARD_NOT_PRESENT.value: 1.0
-        }
 
-       
+        }
 
 
     )
