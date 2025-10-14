@@ -1,0 +1,119 @@
+{
+  "counts": {
+    "total_records": 5000,
+    "non_fraud": 4750,
+    "fraud_total": 250,
+    "fraud_by": {
+      "fraud_type": {
+        "CARD_NOT_PRESENT": 98,
+        "ACCOUNT_TAKEOVER": 57,
+        "SYNTHETIC_IDENTITY": 48,
+        "SOCIAL_ENGINEERING": 47
+      },
+      "age_band": {
+        "A26_35": 82,
+        "A18_25": 71,
+        "A36_50": 58,
+        "A50_PLUS": 39
+      },
+      "region": {
+        "EAST": 70,
+        "WEST": 66,
+        "SOUTH": 61,
+        "NORTH": 53
+      },
+      "channel": {
+        "WEB": 99,
+        "APP": 77,
+        "POS": 38,
+        "ATM": 22,
+        "WIRE": 14
+      },
+      "merchant_category": {
+        "restaurant": 57,
+        "fashion": 55,
+        "grocery": 48,
+        "online_services": 38,
+        "electronics": 29,
+        "travel": 23
+      }
+    }
+  },
+  "causal": {
+    "causal_fraud_count": 100,
+    "causal_fraud_share": 0.02,
+    "scenarios": {
+      "causal_simpson": {
+        "count": 50,
+        "description": "Higher transaction amounts appear safer within each region yet become riskier when regions are aggregated, mimicking a manual review bias."
+      },
+      "causal_collider": {
+        "count": 50,
+        "description": "Fraudulent accounts trigger manual reviews, making higher amounts appear safer within the reviewed subset and creating a collider bias between amount and fraud labels."
+      }
+    }
+  },
+  "data_quality": {
+    "dirty_rows": 0,
+    "dirty_share": 0.0,
+    "issues_by_type": {}
+  },
+  "lineage": {
+    "seed": null,
+    "generator_version": "0.1.0",
+    "timestamp": "2025-10-13T22:05:01.450890+00:00",
+    "config": {
+      "records": 5000,
+      "seed": null,
+      "start_date": "2025-10-13",
+      "days": 7,
+      "age_dist": {
+        "A18_25": 0.3,
+        "A26_35": 0.3,
+        "A36_50": 0.25,
+        "A50_PLUS": 0.15
+      },
+      "channel_dist": null,
+      "region_dist": null,
+      "merchant_category_dist": null,
+      "fraud_rate": 0.05,
+      "fraud_type_dist": {
+        "CARD_NOT_PRESENT": 0.4,
+        "ACCOUNT_TAKEOVER": 0.2,
+        "SYNTHETIC_IDENTITY": 0.2,
+        "SOCIAL_ENGINEERING": 0.2
+      },
+      "causal_fraud": true,
+      "causal_fraud_rate": 0.02,
+      "output": {
+        "format": "parquet",
+        "outdir": "/home/jupyter/olga_zydziak/version_beta/Folder/synthetic-data-generator/notebook_out",
+        "chunk_size": 10000
+      },
+      "data_quality": {
+        "enabled": false,
+        "row_dirty_rate": 0.0,
+        "issue_dist": {},
+        "max_issues_per_row": 2,
+        "missing_cols_whitelist": null,
+        "typos_cols_whitelist": null
+      },
+      "amount_model": null,
+      "time_model": null,
+      "reference_fit": null,
+      "synth_backend": "none",
+      "synth_calibrate_cols": [],
+      "synth_condition_cols": [],
+      "synth_fit_from": null,
+      "synth_max_rows": null,
+      "eval_synth": false
+    }
+  },
+  "synth": {
+    "backend": "none",
+    "calibrate_cols": [],
+    "condition_cols": [],
+    "dp_epsilon": null,
+    "quality_score": null
+  }
+}

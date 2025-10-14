@@ -4,7 +4,14 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+
 from typing import Any, cast
+
+
+
+from typing import Any, cast
+
+
 
 import orjson
 import pandas as pd
@@ -84,6 +91,9 @@ def generate(
     synth_condition_cols: str | None = typer.Option(
         None, help="Condition columns for synth."
     ),
+
+
+
     bucket_name: str | None = typer.Option(
         None, help="Optional bucket name for exporting artifacts."
     ),
@@ -93,12 +103,14 @@ def generate(
     bucket_mount: Path | None = typer.Option(
         None, help="Local mount point for the bucket (defaults to env)."
     ),
+
 ) -> None:
     """Generate synthetic transactions and metadata.
 
     Complexity:
         Time: O(n); Memory: O(1) beyond chunk buffers.
     """
+
 
     data: dict[str, Any] = {}
     if config_path:
@@ -107,6 +119,14 @@ def generate(
         if not isinstance(loaded, dict):
             raise typer.BadParameter("Configuration file must contain a mapping")
         data = cast(dict[str, Any], loaded)
+
+
+    data: dict[str, object] = {}
+    if config_path:
+        with config_path.open("r", encoding="utf-8") as handle:
+            data = json.load(handle)
+
+
 
     age_mapping = _parse_mapping(age_dist)
     fraud_mapping = _parse_mapping(fraud_type_dist)
@@ -137,6 +157,7 @@ def generate(
         }
     )
 
+
     if bucket_name is not None:
         bucket_payload: dict[str, Any] = {"name": bucket_name}
         if bucket_prefix:
@@ -145,6 +166,7 @@ def generate(
             bucket_payload["local_mount"] = str(bucket_mount)
         output_payload = cast(dict[str, Any], data.setdefault("output", {}))
         output_payload["bucket"] = bucket_payload
+
 
     for field_name, mapping in (
         ("channel_dist", _parse_mapping(channel_dist)),

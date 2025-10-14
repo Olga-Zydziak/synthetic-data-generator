@@ -2,14 +2,6 @@
 
 from __future__ import annotations
 
-
-import os
-
-
-import os
-
-
-
 from collections.abc import Mapping
 from datetime import date
 from enum import Enum
@@ -28,15 +20,7 @@ from pydantic import (
 from .exceptions import ConfigurationError
 from .models import AgeBand, Channel, FraudType, Region
 
-from .storage import BucketExporter
-
 __all__ = [
-    "BucketOptions",
-
-
-__all__ = [
-
-
     "OutputOptions",
     "DataQualityIssue",
     "DataQualityConfig",
@@ -44,44 +28,6 @@ __all__ = [
     "GeneratorConfig",
     "parse_generator_config",
 ]
-
-
-
-class BucketOptions(BaseModel):
-    """Configuration for exporting generated files to an object bucket."""
-
-    model_config = ConfigDict(frozen=True)
-
-    name: str = Field(min_length=1)
-    prefix: str | None = None
-    local_mount: Path | None = None
-
-    @model_validator(mode="after")
-    def _normalize(self) -> BucketOptions:
-        prefix = self.prefix.strip("/") if self.prefix else None
-        mount = self.local_mount
-        if mount is None:
-            env_root = os.environ.get("FRAUDFORGE_BUCKET_ROOT")
-            if env_root is None:
-                raise ConfigurationError(
-                    "Bucket local_mount must be provided or FRAUDFORGE_BUCKET_ROOT set"
-                )
-            mount = Path(env_root)
-        object.__setattr__(self, "local_mount", mount.expanduser().resolve())
-        object.__setattr__(self, "prefix", prefix)
-        return self
-
-    def exporter(self) -> BucketExporter:
-        """Create a :class:`BucketExporter` pointing to the resolved target directory."""
-
-        mount = self.local_mount
-        if mount is None:  # pragma: no cover - defensive guard
-            raise ConfigurationError("Bucket local mount not resolved")
-        base = (mount / self.name).resolve()
-        prefix = self.prefix
-        target = base if prefix is None or prefix == "" else (base / prefix)
-        target.mkdir(parents=True, exist_ok=True)
-        return BucketExporter(target)
 
 
 class OutputOptions(BaseModel):
@@ -92,12 +38,6 @@ class OutputOptions(BaseModel):
     format: str = Field(pattern="^(csv|json|parquet)$")
     outdir: Path
     chunk_size: int = Field(ge=1, default=50_000)
-
-    bucket: BucketOptions | None = None
-
-
-    bucket: BucketOptions | None = None
-
 
     @model_validator(mode="after")
     def _resolve_outdir(self) -> OutputOptions:
@@ -115,9 +55,6 @@ class DataQualityIssue(str, Enum):
     DUPLICATE_ROWS = "DUPLICATE_ROWS"
     SWAP_FIELDS = "SWAP_FIELDS"
     DATE_JITTER = "DATE_JITTER"
-
-
-
 
 
 
@@ -139,13 +76,8 @@ class DataQualityConfig(BaseModel):
     types.
     """
 
-
-
-
 class DataQualityConfig(BaseModel):
     """Configuration for data quality injection."""
-
-
 
 
     model_config = ConfigDict(frozen=True)
@@ -160,8 +92,6 @@ class DataQualityConfig(BaseModel):
     @model_validator(mode="after")
     def _validate_dist(self) -> DataQualityConfig:
 
-
-
         source: Mapping[DataQualityIssue, float] | None = None
         if self.enabled:
             source = self.issue_dist or _DEFAULT_ISSUE_DISTRIBUTION
@@ -171,13 +101,10 @@ class DataQualityConfig(BaseModel):
         if source is not None:
             normalized = _normalize_dist({k.value: v for k, v in source.items()})
 
-
         if self.enabled:
             if not self.issue_dist:
                 raise ConfigurationError("issue_dist must be provided when dirty data is enabled")
             normalized = _normalize_dist({k.value: v for k, v in self.issue_dist.items()})
-
-
 
             object.__setattr__(
                 self,
@@ -220,15 +147,7 @@ class GeneratorConfig(BaseModel):
     fraud_rate: float = Field(ge=0.0, le=1.0, default=0.02)
     fraud_type_dist: Mapping[str, float] = Field(
 
-        default_factory=lambda: {
-
-
-        default_factory=lambda: {
-
-
         default_factory=lambda:{
-
-
             FraudType.CARD_NOT_PRESENT.value: 0.22,
             FraudType.ACCOUNT_TAKEOVER.value: 0.18,
             FraudType.AUTHORIZED_PUSH_PAYMENT.value: 0.12,
@@ -238,17 +157,10 @@ class GeneratorConfig(BaseModel):
             FraudType.MONEY_MULE.value: 0.08,
             FraudType.FRIENDLY_FRAUD.value: 0.05,
             FraudType.SOCIAL_ENGINEERING.value: 0.05,
-
-        }
-
-
-        }
-
             FraudType.CARD_NOT_PRESENT.value: 1.0
         }
 
        
-
 
     )
     causal_fraud: bool = Field(alias="casual_fraud", default=False)
