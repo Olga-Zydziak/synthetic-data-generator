@@ -69,16 +69,55 @@ class BucketOptions(BaseModel):
         return self
 
     def exporter(self) -> BucketExporter:
-        """Create a :class:`BucketExporter` pointing to the resolved target directory."""
+        """Create a :class:`BucketExporter` with GCS support if applicable.
+
+        Returns:
+            BucketExporter: Configured exporter for local or GCS destinations.
+
+        Raises:
+            ConfigurationError: If configuration is invalid.
+
+        Complexity:
+            Time: O(1); Memory: O(1).
+        """
+        import re
+        from google.cloud import storage
 
         mount = self.local_mount
-        if mount is None:  # pragma: no cover - defensive guard
+        if mount is None:  # pragma: no cover
             raise ConfigurationError("Bucket local mount not resolved")
-        base = (mount / self.name).resolve()
-        prefix = self.prefix
-        target = base if prefix is None or prefix == "" else (base / prefix)
+
+        # Parse GCS path if present (format: gs://bucket-name/prefix or bucket-name/prefix)
+        gcs_path: str | None = None
+        gcs_client: storage.Client | None = None
+
+        if self.name.startswith("gs://"):
+            # Extract bucket and prefix from gs://bucket-name/prefix
+            match = re.match(r"gs://([^/]+)(?:/(.+))?", self.name)
+            if match:
+                bucket_name = match.group(1)
+                prefix = match.group(2) or ""
+                gcs_path = f"{bucket_name}/{prefix}".rstrip("/")
+
+                try:
+                    gcs_client = storage.Client()
+                    logger.info(f"GCS export enabled: gs://{gcs_path}")
+                except Exception as exc:
+                    logger.warning(
+                        f"GCS client initialization failed: {exc}. "
+                        "Files will only be saved locally."
+                    )
+
+        # Create local staging directory
+        base = mount.resolve()
+        target = base if self.prefix is None else (base / self.prefix)
         target.mkdir(parents=True, exist_ok=True)
-        return BucketExporter(target)
+
+        return BucketExporter(
+            target_dir=target,
+            gcs_path=gcs_path,
+            gcs_client=gcs_client,
+        )
 
 
 class OutputOptions(BaseModel):
